@@ -2,52 +2,63 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreFormRequest;
 use App\Models\Post;
+use App\Http\Requests\StoreFormRequest;
+use Illuminate\Support\Facades\Request;
+
 
 class PostController extends Controller
 {
-   public function index()
-   {
-        $posts = Post::all();
-        return inertia('Posts/Index', compact('posts'));
-   }
+     public function index()
+     {
+          // dd(Request::input('search'));
 
-   public function create()
-   {
-        return inertia('Posts/create');
-   }
+          $posts = Post::query()
+               ->when(Request::input('search'), fn ($q) => $q->search(Request::input('search')))
+               ->paginate(10);
+               
+          $filter = Request::input('search');
 
-   public function store(StoreFormRequest $request)
-   {
-        Post::create($request->validated());
+          return inertia('Posts/Index', [
+               'posts' => $posts,
+               'filter' => $filter,
+          ]);
+     }
 
-        return redirect()->route('posts.index')
-            ->with('message', 'Post created successfully');
-   }
+     public function create()
+     {
+          return inertia('Posts/create');
+     }
 
-   public function edit(Post $post)
-   {
-        
-        $post = Post::findOrFail($post->id);
+     public function store(StoreFormRequest $request)
+     {
+          Post::create($request->validated());
 
-        return inertia('Posts/Edit', compact('post'));
-   }
+          return redirect()->route('posts.index')
+               ->with('message', 'Post created successfully');
+     }
 
-    public function update(Post $post, StoreFormRequest $request)
-    {
-        $post->update($request->validated());
+     public function edit(Post $post)
+     {
 
-        return redirect()->route('posts.index')
-            ->with('message', 'Post update successfully');
-    }
+          $post = Post::findOrFail($post->id);
 
-   public function destroy(Post $post)
-   {
-        $post->delete();
+          return inertia('Posts/Edit', compact('post'));
+     }
 
-        return redirect()->route('posts.index')
-            ->with('message', 'Post delete successfully');
-   }
+     public function update(Post $post, StoreFormRequest $request)
+     {
+          $post->update($request->validated());
 
+          return redirect()->route('posts.index')
+               ->with('message', 'Post update successfully');
+     }
+
+     public function destroy(Post $post)
+     {
+          $post->delete();
+
+          return redirect()->route('posts.index')
+               ->with('message', 'Post delete successfully');
+     }
 }

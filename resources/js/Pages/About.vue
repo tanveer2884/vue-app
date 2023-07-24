@@ -11,7 +11,6 @@
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     
                    <h1>About us page</h1>
-                    
                 </div>
             </div>
         </div>

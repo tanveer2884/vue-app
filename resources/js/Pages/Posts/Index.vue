@@ -1,16 +1,55 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
+import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import DangerButton from '@/Components/DangerButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import Modal from '@/Components/Modal.vue';
-import { ref } from 'vue';
+import Pagination from '@/Components/pagination.vue';
+import { defineProps,ref, watch, onMounted, computed } from 'vue';
+
 
 const showModel = ref(false);
 const postId = ref(null);
+const searchTerm = ref('');
 
-defineProps({ posts: Object });
+const { posts, filter } = defineProps({
+    posts: {
+        type: Object,
+        default: () => ({}),
+    },
+    filter: {
+        type: Object,
+        default: () => ({}),
+    }
+
+});
+
+ 
+const filteredPosts = computed(() => {
+  if (!searchTerm.value) {
+    return posts.data; 
+  }
+
+
+  const term = searchTerm.value.toLowerCase();
+  return posts.data.filter(post => post.title.toLowerCase().includes(term));
+});
+
+
+watch(searchTerm, () => {
+    filterPosts();
+    
+});
+
+const filterPosts = () => {
+   
+  filteredPosts.value = filteredPosts.value;
+};
+
+const getFilter = () => {
+    searchTerm.value = filter
+    console.log('updated filter', filter);
+}
 
 const form = useForm({
 
@@ -37,55 +76,66 @@ const closeModal = () => {
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">Posts</h2>
         </template>
-         <div class="w-full xl:w-8/12 mb-12 xl:mb-0 px-4 mx-auto mt-20">
-            <div class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
-                <div class="rounded-t mb-0 px-4 py-3 border-0">
+         <div class="w-full px-4 mx-auto mt-20 mb-12 xl:w-8/12 xl:mb-0">
+            <div class="relative flex flex-col w-full min-w-0 mb-6 break-words bg-white rounded shadow-lg">
+                <div class="px-4 py-3 mb-0 border-0 rounded-t">
                     <div class="flex flex-wrap items-center">
-                        <div class="relative w-full px-4 max-w-full flex-grow flex-1">
-                             <div v-if="$page.props.flash.message" class="text-blue-600 mb-4">
+                        <div class="relative flex-1 flex-grow w-full max-w-full px-4">
+                             <div v-if="$page.props.flash.message" class="mb-4 text-blue-600">
                                 {{ $page.props.flash.message }}
                             </div>
-                        <h3 class="font-semibold text-base text-blueGray-700">
-                            Posts
+                        <h3 class="text-base font-semibold text-blueGray-700">
+                            Posts 
                         </h3>
                         </div>
-                        <div class="relative w-full px-4 max-w-full flex-grow flex-1 text-right">
-                            <Link :href="route('posts.create')" class="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
+                        <div class="relative flex-1 flex-grow w-full max-w-full px-4 text-right">
+                            <Link :href="route('posts.create')" class="px-3 py-1 mb-1 mr-1 text-xs font-bold text-white uppercase transition-all duration-150 ease-linear bg-indigo-500 rounded outline-none active:bg-indigo-600 focus:outline-none">
                                 Create
                             </Link>
                         </div>
                     </div>
                 </div>
                 <div class="block w-full overflow-x-auto">
-                    <table class="items-center bg-transparent w-full border-collapse">
+                    
+                        <div class="mb-2">
+                            <input
+                                type="text"
+                                v-model="searchTerm"
+                                placeholder="Search..."   
+                                @keyup="onKeyup"
+                               
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-60 p-2.5 "
+                            />
+                        </div>
+                    <table class="items-center w-full bg-transparent border-collapse">
                         <thead>
                             <tr>
-                                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                                <th class="px-6 py-3 text-xs font-semibold text-left uppercase align-middle border border-l-0 border-r-0 border-solid bg-blueGray-50 text-blueGray-500 border-blueGray-100 whitespace-nowrap">
                                     id
                                 </th>
-                                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                                <th class="px-6 py-3 text-xs font-semibold text-left uppercase align-middle border border-l-0 border-r-0 border-solid bg-blueGray-50 text-blueGray-500 border-blueGray-100 whitespace-nowrap">
                                     Title
                                 </th>
-                                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                                <th class="px-6 py-3 text-xs font-semibold text-left uppercase align-middle border border-l-0 border-r-0 border-solid bg-blueGray-50 text-blueGray-500 border-blueGray-100 whitespace-nowrap">
                                     Content
                                 </th>
-                                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                                <th class="px-6 py-3 text-xs font-semibold text-left uppercase align-middle border border-l-0 border-r-0 border-solid bg-blueGray-50 text-blueGray-500 border-blueGray-100 whitespace-nowrap">
                                     Action
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                        <tr  v-for="post in posts" :key="post.id">
-                            <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700">
+                        <tr  v-for="post in filteredPosts" :key="post.id">
+                            <th class="p-4 px-6 text-xs text-left align-middle border-t-0 border-l-0 border-r-0 whitespace-nowrap text-blueGray-700">
                                 {{ post.id }}
                             </th>
-                            <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700">
+                            <th class="p-4 px-6 text-xs text-left align-middle border-t-0 border-l-0 border-r-0 whitespace-nowrap text-blueGray-700">
                                 {{ post.title }}
                             </th>
-                            <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700">
+                            <th class="p-4 px-6 text-xs text-left align-middle border-t-0 border-l-0 border-r-0 whitespace-nowrap text-blueGray-700">
                                 {{ post.content }}
                             </th>
-                            <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-red-400">
+                            <th class="p-4 px-6 text-xs text-left text-red-400 align-middle border-t-0 border-l-0 border-r-0 whitespace-nowrap">
                                 <Link :href="route('posts.edit', post.id)">Edit</Link> |
                                <button @click="openModel(post.id)">Delete</button>
                             </th>
@@ -93,6 +143,7 @@ const closeModal = () => {
                         </tbody>
                     </table>
                 </div>
+                <Pagination :data="posts"></Pagination>
                  <Modal :show="showModel" @close="closeModal">
                     <div class="p-6">
                         <h2 class="text-lg font-medium text-gray-900">
@@ -102,7 +153,7 @@ const closeModal = () => {
                         <p class="mt-1 text-sm text-gray-600">
                             Once your record is deleted, all of its resources and data will be permanently deleted.
                         </p>
-                        <div class="mt-6 flex justify-end">
+                        <div class="flex justify-end mt-6">
                             <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
                             <DangerButton
                                 class="ml-3"
