@@ -19,7 +19,7 @@ const form = useForm({
     </template>
 
     <div class="flex items-center justify-start bg-white">
-      <div class="mx-auto w-full max-w-lg">       
+      <div class="w-full max-w-lg mx-auto">       
         <form @submit.prevent="form.post(route('posts.store'))" class="mt-5">
           <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE" />
           <div class="grid gap-6 sm:grid-cols-2">
@@ -51,10 +51,10 @@ const form = useForm({
             </div>
             </div>
           </div>
-            <Link :href="route('posts.index')" class="mt-5 rounded-md bg-black mr-2 px-10 py-2 text-white">
+            <Link :href="route('posts.index')" class="px-10 py-2 mt-5 mr-2 text-white bg-black rounded-md">
                 cancle
             </Link>
-           <button type="submit" :disabled="form.processing" class="mt-5 rounded-md bg-black px-10 py-2 text-white">
+           <button type="submit" :disabled="form.processing" class="px-10 py-2 mt-5 text-white bg-black rounded-md">
                 Submit
           </button>
         </form>

@@ -16,8 +16,8 @@
             v-for="(link, k) in data.links"
             :key="k"
             class="px-4 py-3 text-sm leading-4 bg-white rounded hover:bg-indigo-400 focus:text-indigo-500 hover:shadow"
-            :class="{'bg-indigo-800 text-white': link.active}"
-            :href="link.url"
+            :class="{'bg-indigo-700 text-white': link.active}"
+            :href="link.url ?? ''"
             v-html="link.label"
         />
     </div>

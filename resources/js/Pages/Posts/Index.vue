@@ -5,51 +5,32 @@ import DangerButton from '@/Components/DangerButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import Modal from '@/Components/Modal.vue';
 import Pagination from '@/Components/pagination.vue';
-import { defineProps,ref, watch, onMounted, computed } from 'vue';
-
+import { defineProps, ref, computed, onMounted } from 'vue';
 
 const showModel = ref(false);
 const postId = ref(null);
 const searchTerm = ref('');
 
-const { posts, filter } = defineProps({
+const { posts } = defineProps({
     posts: {
-        type: Object,
-        default: () => ({}),
-    },
-    filter: {
         type: Object,
         default: () => ({}),
     }
 
 });
 
- 
 const filteredPosts = computed(() => {
   if (!searchTerm.value) {
     return posts.data; 
   }
 
-
   const term = searchTerm.value.toLowerCase();
   return posts.data.filter(post => post.title.toLowerCase().includes(term));
 });
 
-
-watch(searchTerm, () => {
-    filterPosts();
-    
+onMounted(() => {
+  searchTerm.value.focus()
 });
-
-const filterPosts = () => {
-   
-  filteredPosts.value = filteredPosts.value;
-};
-
-const getFilter = () => {
-    searchTerm.value = filter
-    console.log('updated filter', filter);
-}
 
 const form = useForm({
 
@@ -103,7 +84,7 @@ const closeModal = () => {
                                 v-model="searchTerm"
                                 placeholder="Search..."   
                                 @keyup="onKeyup"
-                               
+                                ref="searchTerm"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-60 p-2.5 "
                             />
                         </div>
@@ -125,7 +106,7 @@ const closeModal = () => {
                             </tr>
                         </thead>
                         <tbody>
-                        <tr  v-for="post in filteredPosts" :key="post.id">
+                        <tr v-for="post in filteredPosts" :key="post.id">
                             <th class="p-4 px-6 text-xs text-left align-middle border-t-0 border-l-0 border-r-0 whitespace-nowrap text-blueGray-700">
                                 {{ post.id }}
                             </th>

@@ -11,17 +11,12 @@ class PostController extends Controller
 {
      public function index()
      {
-          // dd(Request::input('search'));
-
           $posts = Post::query()
                ->when(Request::input('search'), fn ($q) => $q->search(Request::input('search')))
                ->paginate(10);
                
-          $filter = Request::input('search');
-
           return inertia('Posts/Index', [
                'posts' => $posts,
-               'filter' => $filter,
           ]);
      }
 
