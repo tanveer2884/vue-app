@@ -7,9 +7,11 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
 import { InertiaProgress } from '@inertiajs/progress';
 import PrimeVue from 'primevue/config';
+import ConfirmationService from 'primevue/confirmationservice';
 import 'primevue/resources/themes/md-light-indigo/theme.css'; // Choose a theme from PrimeVue
 import 'primevue/resources/primevue.min.css';
 import 'primeicons/primeicons.css';
+import ToastService from 'primevue/toastservice';
 
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
@@ -22,6 +24,8 @@ createInertiaApp({
             .use(plugin)
             .use(ZiggyVue, Ziggy)
             .use(PrimeVue)
+            .use(ConfirmationService)
+            .use(ToastService)
             .mount(el);
     },
     progress: {

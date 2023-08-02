@@ -1,6 +1,15 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
+import Button from 'primevue/button';
+import Textarea from 'primevue/textarea';
+import InputText from 'primevue/inputtext';
+import FileUpload from 'primevue/fileupload';
+import Card from 'primevue/card';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
+
+const toast = useToast();
 
 defineProps({ errors: Object })
 const form = useForm({
@@ -8,6 +17,8 @@ const form = useForm({
     des: '',
     img: '',
 });
+
+
 </script>
 
 <template>
@@ -18,56 +29,68 @@ const form = useForm({
                 Product Create
             </h2>
         </template>
-
-        <div class="flex items-center justify-start bg-white">
-            <div class="w-full max-w-lg mx-auto">
-                <form @submit.prevent="form.post(route('products.store'))" class="mt-5">
-                    <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE" />
-                    <div class="grid gap-6 sm:grid-cols-2">
-                        <div class="relative z-0">
-                            <input type="text" v-model="form.title"
-                                class="peer block w-full appearance-none border-0 border-b border-gray-500 bg-transparent py-2.5 px-0 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0"
-                                placeholder=" " />
-                            <label
-                                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:left-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:text-blue-600 peer-focus:dark:text-blue-500">Title</label>
-                            <div v-if="errors.title" class="text-red-600">
-                                {{ errors.title }}
+        <br>
+        <Card class="product-card">
+            <template #title> Create Product </template>
+            <template #content>
+                <div class="flex justify-start">
+                    <div class="w-full mx-auto">
+                        <form @submit.prevent="form.post(route('products.store'))" class="mt-5">
+                            <div class="flex flex-col px-8 pt-6 pb-8 my-2 mb-4">
+                                <div class="mx-3 mb-6 ">
+                                    <span class="p-float-label">
+                                        <InputText id="username" v-model="form.title" :class="errors.title ? 'username p-invalid' : 'username'" requried />
+                                        <label for="username">Title</label>
+                                    </span>
+                                    <div v-if="errors.title" class="text-red-600">
+                                        {{ errors.title }}
+                                    </div>
+                                </div>
+                                <div class="mx-3 mb-6">
+                                    <div class="card">
+                                        <FileUpload name="img" @input="form.img = $event.target.files[0]"
+                                            @upload="onAdvancedUpload($event)" :multiple="true" accept="image/*"
+                                            :maxFileSize="1000000">
+                                            <template #empty>
+                                                <p>Drag and drop files to here to upload.</p>
+                                            </template>
+                                        </FileUpload>
+                                        <div v-if="errors.img" class="text-red-600">
+                                            {{ errors.img }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mx-3 mb-6">
+                                    <span class="p-float-label">
+                                        <Textarea v-model="form.des" rows="5" cols="30" :class="errors.title ? 'username p-invalid' : 'username'" />
+                                        <label>Description</label>
+                                    </span>
+                                    <div v-if="errors.des" class="text-red-600">
+                                        {{ errors.des }}
+                                    </div>
+                                </div>
+                                <div class="float-right mx-3 ml-2 space-x-2">
+                                    <Link :href="route('products.index')" severity="warning" class="p-button p-component p-button-warning"> Cancle </Link>
+                                    <Toast />
+                                    <Button label="Submit" type="submit" />
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="relative z-0">
-                            <input type="file" name="img" @input="form.img = $event.target.files[0]"
-                                class="peer block w-full appearance-none border-0 border-b border-gray-500 bg-transparent py-2.5 px-0 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0"
-                                placeholder=" " />
-                            <label
-                                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:left-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:text-blue-600 peer-focus:dark:text-blue-500">Image</label>
-                            <div v-if="errors.img" class="text-red-600">
-                                {{ errors.img }}
-                            </div>
-                        </div>
-
-                        <div class="relative z-0 col-span-2">
-                            <textarea name="message" v-model="form.des" rows="5"
-                                class="peer block w-full appearance-none border-0 border-b border-gray-500 bg-transparent py-2.5 px-0 text-sm text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0"
-                                placeholder=" "></textarea>
-                            <label
-                                class="absolute top-3 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:left-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:text-blue-600 peer-focus:dark:text-blue-500">
-                                Content
-                            </label>
-                            <div v-if="errors.des" class="text-red-600">
-                                {{ errors.des }}
-                            </div>
-                        </div>
+                        </form>
                     </div>
-                    <Link :href="route('posts.index')" class="px-10 py-2 mt-5 mr-2 text-white bg-black rounded-md">
-                    cancle
-                    </Link>
-                    <button type="submit" :disabled="form.processing"
-                        class="px-10 py-2 mt-5 text-white bg-black rounded-md">
-                        Submit
-                    </button>
-                </form>
-            </div>
-        </div>
+                </div>
+            </template>
+        </Card>
     </AuthenticatedLayout>
 </template>
+
+<style>
+.product-card {
+    width: 50%;
+    margin-left: 25%;
+    margin-bottom: 30%;
+}
+
+.username {
+    width: 100%;
+}
+</style>

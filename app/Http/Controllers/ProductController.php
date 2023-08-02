@@ -33,13 +33,21 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'title' => 'required|max:191',
+            'des' => 'required|max:255',
+            'img' => 'required',
+        ]);
+
+        // dd($request->all());
        $product = new Product();
        $product->title = $request->title;
        $product->des = $request->des;
        $product->addMediaFromRequest('img')->toMediaCollection('img');
        $product->save();
 
-       return redirect()->route('products.index');
+       return redirect()->route('products.index')
+            ->with('message', 'Product Added Successfully');
     }
 
     /**
@@ -65,15 +73,22 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $validated = $request->validate([
+            'title' => 'required|max:191',
+            'des' => 'required|max:255',
+            
+        ]);
+
         $product = Product::findOrFail($id);
-        if(count($product->media) > 0) {
+        if($request->img != null) {
             $product->media[0]->delete();
+            $product->addMediaFromRequest('img')->toMediaCollection('img');
         }
         $product->title = $request->title;
         $product->des = $request->des;
-        $product->addMediaFromRequest('img')->toMediaCollection('img');
         $product->update();
-        return redirect()->route('products.index');
+        return redirect()->route('products.index')
+            ->with('message', 'Product Updated Successfully');;
     }
 
     /**
@@ -83,7 +98,8 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $product->delete();
-        return redirect()->route('products.index');
+        return redirect()->route('products.index')
+            ->with('message', 'Product Deleted Successfully');
 
     }
 }
